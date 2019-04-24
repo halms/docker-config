@@ -8,4 +8,4 @@ VOLUME /etc/unbound
 
 EXPOSE 53/udp 53/tcp
 
-ENTRYPOINT [ "/usr/sbin/unbound", "-c", "/etc/unbound/unbound.conf", "-d", "-v" ]
+ENTRYPOINT [ "/usr/sbin/unbound-anchor", "-a", "/etc/unbound/root.key" && "/usr/sbin/unbound", "-c", "/etc/unbound/unbound.conf", "-d", "-v" ]
