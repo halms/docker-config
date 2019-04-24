@@ -1,6 +1,7 @@
 FROM alpine:edge
 
 RUN apk --no-cache add \
+    ca-certificates \
     unbound
 
 VOLUME /etc/unbound
