@@ -1,8 +1,10 @@
-FROM alpine:edge
+FROM alpine:3
 
 RUN apk --no-cache add \
     ca-certificates \
     unbound
+
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/sbin/unbound
 
 VOLUME /etc/unbound
 
