@@ -3,8 +3,8 @@ name: 'unbound: Docker CI'
 env:
   CONTEXT: unbound
 
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner	}}/unbound
+  GH_IMAGE_NAME: ${{ github.repository_owner }}/unbound
+  DH_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/unbound
   
 
 on:
@@ -35,26 +35,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
+      - name: Log into ghcr.io
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Log into Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: |
+            ghcr.io/${{ env.GH_IMAGE_NAME }}
+            ${{ env.DH_IMAGE_NAME }}
           flavor: |
             latest=true
           tags: |
             type=edge
             type=raw,value={{date 'YYYYMMDD'}}
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: ${{ env.CONTEXT }}
